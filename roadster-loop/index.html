@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Roadster Loop — Free Night Ramp Stunt Game</title>
+    <meta name="description" content="Wait for green, launch an electric roadster up a giant night-time ramp, flip, thrust through light rings and stick the landing. Free browser game.">
+    <meta name="theme-color" content="#050505">
+    <meta property="og:title" content="Roadster Loop — Night Ramp Stunt Game">
+    <meta property="og:description" content="Launch, drive, ramp, air, land. Free browser stunt game.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23050505'/%3E%3Cpath d='M10 40q4-14 20-14h8q12 0 16 14z' fill='%2300d2ff'/%3E%3Ccircle cx='22' cy='42' r='6' fill='%23050505' stroke='%2300d2ff' stroke-width='3'/%3E%3Ccircle cx='44' cy='42' r='6' fill='%23050505' stroke='%2300d2ff' stroke-width='3'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <noscript><p style="padding:2rem">Roadster Loop needs JavaScript enabled.</p></noscript>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+
+        <div id="ui-layer">
+            <div id="screen-title" class="screen active">
+                <div class="logo">ROADSTER<span>LOOP</span></div>
+                <div class="subtitle">STUNT CHALLENGE</div>
+                <button id="btn-start" class="btn-main">START ENGINE</button>
+                <div class="controls-hint">WAIT FOR GREEN, THEN PRESS SPACE (OR TAP). IN THE AIR: LEFT / RIGHT ROTATE, HOLD SPACE FOR THRUSTERS. LAND UPRIGHT AT 39 FT/S OR LESS.</div>
+                <div class="best-score">BEST: <span id="best-value">0</span></div>
+            </div>
+
+            <div id="screen-count" class="screen">
+                <div class="lights-container">
+                    <div class="light" id="light-1"></div>
+                    <div class="light" id="light-2"></div>
+                    <div class="light" id="light-3"></div>
+                    <div class="light" id="light-4"></div>
+                </div>
+                <div id="early-warning" class="warning">TOO EARLY, WAIT FOR GREEN</div>
+            </div>
+
+            <div id="hud" class="hud-hidden">
+                <div class="hud-top">
+                    <div class="stat-box"><div class="label">SPEED</div><div class="value"><span id="hud-speed">0</span> <small>MPH</small></div></div>
+                    <div class="stat-box"><div class="label">ALT</div><div class="value"><span id="hud-alt">0</span> <small>FT</small></div></div>
+                    <div id="hud-reaction" class="stat-box hidden"><div class="label">REACTION</div><div class="value"><span id="val-reaction">0.000</span>s</div></div>
+                    <div class="stat-box"><div class="label">RINGS</div><div class="value" id="hud-rings">0</div></div>
+                    <div class="stat-box"><div class="label">FLIPS</div><div class="value" id="hud-flips">0</div></div>
+                    <div class="stat-box"><div class="label">SCORE</div><div class="value" id="hud-score">0</div></div>
+                </div>
+                <div class="gas-meter-container">
+                    <div class="gas-label">COLD GAS</div>
+                    <div class="gas-bar-bg"><div id="gas-fill" class="gas-bar-fill"></div></div>
+                </div>
+            </div>
+
+            <div id="msg" aria-live="polite"></div>
+            <div id="touch-rot" aria-hidden="true"><button id="rot-left" type="button">◀</button><button id="rot-right" type="button">▶</button></div>
+            <button id="touch-action" type="button" aria-label="Tap to launch, hold for thrusters">TAP TO LAUNCH / HOLD FOR THRUST</button>
+
+            <div id="screen-results" class="screen">
+                <div class="results-card">
+                    <div id="new-best-badge" class="badge hidden">NEW BEST</div>
+                    <h1 id="result-grade">GRADE: S</h1>
+                    <div class="result-score" id="result-score">0</div>
+                    <div class="stats-grid">
+                        <div class="grid-item"><div class="l">REACTION</div><div class="v" id="res-reaction">-</div></div>
+                        <div class="grid-item"><div class="l">RAMP SPEED</div><div class="v" id="res-rampspeed">-</div></div>
+                        <div class="grid-item"><div class="l">PEAK G</div><div class="v" id="res-peakg">-</div></div>
+                        <div class="grid-item"><div class="l">MAX ALTITUDE</div><div class="v" id="res-alt">-</div></div>
+                        <div class="grid-item"><div class="l">AIRTIME</div><div class="v" id="res-airtime">-</div></div>
+                        <div class="grid-item"><div class="l">FLIPS</div><div class="v" id="res-flips">-</div></div>
+                        <div class="grid-item"><div class="l">RINGS</div><div class="v" id="res-rings">-</div></div>
+                        <div class="grid-item"><div class="l">TOUCHDOWN</div><div class="v" id="res-landing">-</div></div>
+                    </div>
+                    <button id="btn-restart" class="btn-main">RUN IT AGAIN</button>
+                </div>
+            </div>
+        </div>
+
+        <footer>Unofficial fan game, not affiliated with Tesla. | <a href="privacy.html">Privacy</a></footer>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>

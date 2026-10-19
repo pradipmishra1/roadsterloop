@@ -1,0 +1,356 @@
+:root {
+    --bg-color: #050505;
+    --accent-blue: #00d2ff;
+    --accent-red: #ff3c3c;
+    --accent-green: #3cff7d;
+    --text-color: #ffffff;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+}
+
+#game-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+#ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+}
+
+#ui-layer button, #ui-layer .screen {
+    pointer-events: auto;
+}
+
+#game-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.screen {
+    display: none;
+    position: absolute;
+    inset: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    text-align: center;
+}
+
+.screen.active { display: flex; }
+
+/* Title Screen */
+.logo {
+    font-size: 4rem;
+    font-weight: 900;
+    letter-spacing: -0.1rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 20px var(--accent-blue);
+}
+
+.logo span {
+    color: var(--accent-blue);
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    letter-spacing: 0.5rem;
+    margin-bottom: 3rem;
+    color: #888;
+}
+
+.best-score {
+    margin-top: 2rem;
+    font-size: 1.2rem;
+    color: #aaa;
+}
+
+.controls-hint {
+    max-width: 440px;
+    margin: 1.5rem auto 0;
+    color: #777;
+    font-size: 0.75rem;
+    line-height: 1.6;
+    letter-spacing: 0.08rem;
+}
+
+.btn-main {
+    padding: 1rem 3rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.1rem;
+}
+
+.btn-main:hover {
+    background: white;
+    color: black;
+    transform: scale(1.05);
+}
+
+/* Lights Screen */
+.lights-container {
+    display: flex;
+    gap: 1.5rem;
+    background: rgba(0,0,0,0.5);
+    padding: 2rem;
+    border-radius: 1rem;
+    border: 1px solid var(--glass-border);
+}
+
+.light {
+    width: 4rem;
+    height: 4rem;
+    background: #222;
+    border-radius: 50%;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    transition: all 0.05s ease;
+}
+
+.light.red {
+    background: var(--accent-red);
+    box-shadow: 0 0 30px var(--accent-red);
+}
+
+.light.green {
+    background: var(--accent-green);
+    box-shadow: 0 0 40px var(--accent-green);
+}
+
+.warning {
+    margin-top: 2rem;
+    color: var(--accent-red);
+    font-weight: bold;
+    font-size: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.1s;
+}
+
+.warning.visible {
+    opacity: 1;
+}
+
+/* HUD */
+#hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 2rem;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.hud-hidden {
+    opacity: 0;
+}
+
+.hud-top {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.stat-box {
+    text-align: center;
+}
+
+.stat-box.hidden {
+    display: none;
+}
+
+.stat-box .label {
+    font-size: 0.8rem;
+    color: #888;
+    letter-spacing: 0.1rem;
+}
+
+.stat-box .value {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.gas-meter-container {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+}
+
+.gas-label {
+    font-size: 0.7rem;
+    color: var(--accent-blue);
+    margin-bottom: 0.3rem;
+    text-align: center;
+    letter-spacing: 0.1rem;
+}
+
+.gas-bar-bg {
+    height: 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.gas-bar-fill {
+    height: 100%;
+    width: 100%;
+    background: var(--accent-blue);
+    box-shadow: 0 0 10px var(--accent-blue);
+    transition: width 0.1s linear;
+}
+
+#touch-action {
+    display: none;
+    position: absolute;
+    z-index: 4;
+    bottom: 5.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1rem 1.4rem;
+    border: 1px solid rgba(0, 210, 255, 0.75);
+    border-radius: 999px;
+    background: rgba(0, 20, 28, 0.78);
+    color: var(--accent-blue);
+    font-weight: 800;
+    letter-spacing: 0.06rem;
+    touch-action: none;
+    cursor: pointer;
+}
+
+#touch-action.visible { display: block; }
+#touch-action:active { background: rgba(0, 210, 255, 0.28); }
+
+@media (hover: hover) and (pointer: fine) {
+    #touch-action.visible { display: none; }
+}
+
+/* Results Card */
+.results-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    padding: 3rem;
+    border-radius: 2rem;
+    text-align: center;
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+}
+
+.badge {
+    position: absolute;
+    top: -1rem;
+    right: -1rem;
+    background: var(--accent-blue);
+    color: black;
+    padding: 0.5rem 1rem;
+    font-weight: 900;
+    border-radius: 0.5rem;
+    transform: rotate(15deg);
+    box-shadow: 0 0 20px var(--accent-blue);
+}
+
+.badge.hidden { display: none; }
+
+#result-grade {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+.result-score {
+    font-size: 4rem;
+    font-weight: 900;
+    margin-bottom: 2rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.grid-item {
+    background: rgba(255,255,255,0.03);
+    padding: 0.8rem;
+    border-radius: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.grid-item .l { font-size: 0.7rem; color: #888; }
+.grid-item .v { font-weight: bold; }
+
+footer {
+    position: absolute;
+    bottom: 1rem;
+    width: 100%;
+    text-align: center;
+    font-size: 0.7rem;
+    color: #444;
+    pointer-events: auto;
+}
+
+footer a { color: #666; text-decoration: none; }
+footer a:hover { color: #888; }
+
+@media (max-width: 600px) {
+    .logo { font-size: 2.5rem; }
+    .lights-container { gap: 0.5rem; padding: 1rem; }
+    .light { width: 2.5rem; height: 2.5rem; }
+    .results-card { padding: 1.5rem; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .result-score { font-size: 3rem; }
+    .controls-hint { max-width: 300px; font-size: 0.65rem; }
+    #touch-action { bottom: 5rem; padding: 0.9rem 1.1rem; font-size: 0.75rem; }
+}
+
+/* ---- production additions ---- */
+.hud-top { flex-wrap: wrap; justify-content: center; gap: 0.6rem 1.6rem; }
+.gas-meter-container { bottom: 2.8rem; }
+#msg { position: absolute; top: 34%; left: 0; right: 0; text-align: center; font-size: clamp(1.6rem, 5vw, 2.8rem); font-weight: 900; letter-spacing: .08rem; opacity: 0; transition: opacity .15s; pointer-events: none; text-shadow: 0 0 20px var(--accent-blue); }
+#msg.on { opacity: 1; }
+#msg.bad { color: var(--accent-red); text-shadow: 0 0 20px var(--accent-red); }
+#touch-rot { display: none; position: absolute; z-index: 4; bottom: 9rem; left: 1rem; right: 1rem; justify-content: space-between; pointer-events: none; }
+#touch-rot.visible { display: flex; }
+#touch-rot button { pointer-events: auto; width: 4.6rem; height: 4.6rem; border-radius: 50%; border: 1px solid rgba(0,210,255,.75); background: rgba(0,20,28,.7); color: var(--accent-blue); font-size: 1.6rem; touch-action: none; }
+#touch-rot button:active { background: rgba(0,210,255,.28); }
+@media (hover: hover) and (pointer: fine) { #touch-rot.visible { display: none; } }
+.btn-main:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 3px; }
+@media (max-width: 600px) { .stat-box .value { font-size: 1.2rem; } #hud { padding: 1rem; } }
