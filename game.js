@@ -87,7 +87,7 @@ for (let i = 0; i < 70; i++) {
 const wheels = [], plumes = []; let carLight;
 function buildCar() {
   const g = new THREE.Group(), body = new THREE.Group();
-  const paint = new THREE.MeshPhysicalMaterial({ color: 0xf4f7fb, metalness: .25, roughness: .3, clearcoat: 1, clearcoatRoughness: .06, envMapIntensity: 1.2 });
+  const paint = new THREE.MeshPhysicalMaterial({ color: 0xf4f7fb, metalness: .05, roughness: .35, clearcoat: 1, clearcoatRoughness: .06, envMapIntensity: .8 });
   const dark = new THREE.MeshStandardMaterial({ color: 0x0b0e16, metalness: .6, roughness: .45 });
   const s = new THREE.Shape();
   s.moveTo(-7.5, .6); s.lineTo(-5.9, .6); s.lineTo(-5.9, 1.1); s.absarc(-4.6, 1.1, 1.3, Math.PI, 0, true);
@@ -129,6 +129,7 @@ function buildCar() {
     const port = new THREE.Mesh(new THREE.CylinderGeometry(.35, .35, .15, 10), glowM(0x6b8cff)); port.position.set(sx, .55, sz); g.add(port);
     const p = new THREE.Mesh(pg, pm); p.position.set(sx, .5, sz); p.visible = false; g.add(p); plumes.push(p);
   }
+  const key = new THREE.PointLight(0xffffff, 1.2, 45); key.position.set(0, 16, 8); g.add(key);
   carLight = new THREE.PointLight(0x2ee6ff, .9, 30); carLight.position.set(0, .2, 0); g.add(carLight);
   const hs = new THREE.SpotLight(0xdff6ff, 2, 70, .55, .6); hs.position.set(7, 1.5, 0); hs.target.position.set(150, -3, 0); g.add(hs); g.add(hs.target);
   g.scale.setScalar(.31); scene.add(g); return g;
@@ -160,8 +161,10 @@ function msg(t, ms, bad) { const m = $('msg'); m.textContent = t; m.className = 
 function clearFx() { deb.forEach(d => scene.remove(d.m)); deb.length = 0; if (flash) { scene.remove(flash); flash = null; } rings.forEach(r => scene.remove(r.m)); rings.length = 0; }
 function startCount() {
   if (state === 'count') return;
+  try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); } catch (e) {}
   clearFx(); Object.assign(car, { s: 0, x: -RUN, y: 0, a: 0, w: 0, vx: 0, vy: 0, v: 0 });
   carG.visible = true; state = 'count'; thrusting = false;
+  run = { react: 0, mph: 0, v0: 0, A: 0, gas: 1, rings: 0, flips: 0, maxAlt: 0, peakG: 1, airT: 0, flipZone: false, sink: 0, ok: false };
   Object.assign(cnt, { on: 0, t: 0, wait: .8 + Math.random() * 1.4, green: false, lock: 0 });
   Ls.forEach(l => l.className = 'light'); setScreen('screen-count'); $('msg').className = ''; $('early-warning').classList.remove('visible'); $('hud-reaction').classList.add('hidden');
 }
@@ -185,7 +188,7 @@ function launch(r) {
     m.add(new THREE.Mesh(new THREE.TorusGeometry(3, .6, 8, 40), new THREE.MeshBasicMaterial({ color: i % 2 ? 0xff4fa3 : 0x2ee6ff, transparent: true, opacity: .18, blending: THREE.AdditiveBlending, depthWrite: false }))); m.position.set(x, y, 0); scene.add(m); rings.push({ m, x, y, got: false, o: 1 });
   });
   car.s = 0; car.v = 0; state = 'drive'; msg('GO!', 700); beep(1000, .2);
-  armed = false; $('val-reaction').textContent = r.toFixed(3); $('hud-reaction').classList.remove('hidden');
+  armed = !keys.space; $('val-reaction').textContent = r.toFixed(3); $('hud-reaction').classList.remove('hidden');
   setTimeout(() => { if (state === 'drive' || state === 'ramp' || state === 'air') $('screen-count').classList.remove('active'); }, 1200);
 }
 function touch() {
@@ -278,7 +281,7 @@ function visuals(dt) {
 }
 let last = performance.now(), acc = 0;
 function frame(n) {
-  const dt = Math.min((n - last) / 1000, .1); last = n; acc += dt;
+  const dt = Math.max(0, Math.min((n - last) / 1000, .1)); last = n; acc += dt;
   if (state === 'count') {
     cnt.t += dt;
     if (cnt.on < 4) { if (cnt.t >= .7 * (cnt.on + 1)) { cnt.on++; Ls.forEach((l, i) => l.className = i < cnt.on ? 'light red' : 'light'); beep(440, .08); } }

@@ -354,3 +354,20 @@ footer a:hover { color: #888; }
 @media (hover: hover) and (pointer: fine) { #touch-rot.visible { display: none; } }
 .btn-main:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 3px; }
 @media (max-width: 600px) { .stat-box .value { font-size: 1.2rem; } #hud { padding: 1rem; } }
+
+/* launch fixes: clickable privacy link, results card fits small screens, title above car */
+footer { z-index: 3; pointer-events: none; color: #777; }
+footer a { pointer-events: auto; color: #9aa7b8; }
+footer a:hover { color: #fff; }
+#screen-results { justify-content: flex-start; overflow-y: auto; overflow-x: hidden; }
+.results-card { margin: auto; }
+#screen-title { justify-content: flex-start; padding-top: 9vh; }
+@media (max-width: 600px) {
+  .results-card { padding: 1.25rem; }
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: .5rem; }
+  .grid-item { flex-direction: column; gap: .2rem; padding: .5rem; }
+  .result-score { margin-bottom: 1rem; }
+}
+
+/* hud fix: full-height so the gas bar sits at the bottom */
+#hud { height: 100%; }
